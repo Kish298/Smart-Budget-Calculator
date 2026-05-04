@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+
+<body>
+    <div class="container">
+
+        <div class="card">
+                <h4>Add Expense</h4>
+                <form method="POST" action="/add">
+
+                    <select name="category" required>
+                        <option value="">Select Category</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="type" required>
+                        <option value="Needs">Needs</option>
+                        <option value="Wants">Wants</option>
+                        <option value="Investment">Investment</option>
+                        <option value="Savings">Savings</option>
+                    </select>
+
+                    <input name="date" type="text" placeholder="M/D/YYYY" pattern="\d{1,2}[-/]\d{1,2}[-/]\d{4}" title="Date format: M/D/YYYY or MM/DD/YYYY" required>
+                    <input name="amount" type="number" step="0.01" placeholder="Amount" required>
+
+                    <select name="payment" required>
+                        <option value="">Select Payment Method</option>
+                        {% for method in payment_methods %}
+                            <option value="{{ method }}">{{ method }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <input name="notes" placeholder="Notes">
+
+                    <button type="submit">Add</button>
+
+                </form>
+        </div>
+
+
+
+        <div class="header">
+            <h2>📊 Dashboard — {{ month_name }} {{ year }}</h2>
+        </div>
+
+        <!-- FILTER -->
+        <div class="card">
+            <form method="POST">
+                <input type="number" name="month" min="1" max="12" placeholder="Month" required>
+                <input type="number" name="year" placeholder="Year" required>
+                <button type="submit">Apply</button>
+            </form>
+        </div>
+
+        <!-- KPI -->
+        <div class="kpi">
+            <div>💰<br>Total<br>₹{{ "%.0f"|format(total) }}</div>
+            <div>🟢<br>Needs<br>₹{{ "%.0f"|format(needs) }}</div>
+            <div>🟡<br>Wants<br>₹{{ "%.0f"|format(wants) }}</div>
+            <div>🔵<br>Investment<br>₹{{ "%.0f"|format(investment) }}</div>
+            <div>💼<br>Savings<br>₹{{ "%.0f"|format(savings) }}</div>
+        </div>
+
+         <!-- CHARTS -->
+        <div class="charts">
+
+            <div class="card">
+                <h4>Category Spend</h4>
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h4>Spending Split</h4>
+                <canvas id="pieChart"></canvas>
+        </div>
+
+        <script>
+            renderCharts(
+                {{ category_labels | tojson }},
+                {{ category_values | tojson }},
+                {{ needs }},
+                {{ wants }},
+                {{ investment }},
+                {{ savings }}
+            );
+        </script>
+
+    </div>
+    </body>
+</html>

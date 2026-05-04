@@ -1,0 +1,11 @@
+Timestamp,Date,Category,Type,Amount,Payment,Notes
+5/2/2026 21:44:04,5/1/2026,Groceries,Needs,290,UPI,Fish and prawns 
+5/2/2026 21:44:48,5/1/2026,Groceries,Needs,125,UPI,Veggies
+5/2/2026 21:46:09,5/1/2026,Groceries,Needs,50,UPI,
+5/2/2026 21:47:26,5/2/2026,SIP,Investment,10000,Auto pay,Grow MF
+5/2/2026 21:48:24,5/2/2026,EMI,Wants,4437,UPI,Swati Laptop emi 
+5/2/2026 21:49:12,5/2/2026,Shopping,Wants,5282,UPI,Cc bill
+5/2/2026 21:49:57,5/2/2026,Utility Bills,Needs,7320,UPI,Ebill
+5/2/2026 21:50:50,5/2/2026,Savings,Savings,10500,Bank transfer,Transfer to moms account 
+5/2/2026 21:51:35,5/2/2026,SIP,Investment,17500,UPI,Stock Investment
+5/2/2026 21:52:07,5/2/2026,Groceries,Needs,50,UPI,Onion
