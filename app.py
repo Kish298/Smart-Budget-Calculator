@@ -52,17 +52,6 @@ def add_expense():
     spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/12gW_5E-dc8_t06jHLhiBmeGqRwH0OgOXlpM2XwUrPiI/edit?gid=314051676#gid=314051676")
     worksheet = spreadsheet.worksheet("Form Responses 1")
 
-    categories_sheet = spreadsheet.worksheet("Categories")
-    data = categories_sheet.get_all_values()
-
-    categories = [
-        row[0].strip()
-        for row in data[1:]
-        if row and row[0].strip()
-    ]
-
-    categories = sorted(set(categories))
-
     # Get form data
     category = request.form.get("category")
     type_ = request.form.get("type")
@@ -93,10 +82,11 @@ def add_expense():
     except ValueError:
         amount = 0.0
 
-    # Append row to the Form Responses 1 worksheet, leaving A blank
+    # Append the new row safely to Form Responses 1
     worksheet.append_row(
         [now, expense_date, category, type_, amount, payment, notes],
-        value_input_option="USER_ENTERED"
+        value_input_option="USER_ENTERED",
+        insert_data_option="INSERT_ROWS"
     )
 
     return redirect(url_for("index"))
