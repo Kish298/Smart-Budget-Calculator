@@ -1,12 +1,16 @@
+import os
+import json
+import calendar
+import datetime
+from pathlib import Path
+
 from flask import Flask, render_template, request, redirect, url_for
+from google.oauth2.service_account import Credentials
+
 from modules.loader import load_data
 from modules.filters import filter_by_month
 from modules.sheets_loader import load_data_from_sheets, load_categories_from_sheets
 from modules.analysis import total_spend, section_wise_data, category_spend
-
-import calendar
-import datetime
-from pathlib import Path
 
 app = Flask(__name__)
 
@@ -14,18 +18,36 @@ BASE_DIR = Path(__file__).resolve().parent
 CREDENTIALS_PATH = BASE_DIR / "config" / "credentials.json"
 
 
-@app.route("/add", methods=["POST"])
-def add_expense():
-    import gspread
-    from google.oauth2.service_account import Credentials
-
+def _get_gspread_client():
+    """Get authorized gspread client using env var or file."""
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
+    
+    import gspread
+    
+    # Try environment variable first
+    creds_json = os.getenv("GOOGLE_CREDS")
+    if creds_json:
+        try:
+            creds_dict = json.loads(creds_json)
+            creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+            return gspread.authorize(creds)
+        except Exception:
+            pass
+    
+    # Fall back to file
+    try:
+        creds = Credentials.from_service_account_file(str(CREDENTIALS_PATH), scopes=scope)
+        return gspread.authorize(creds)
+    except Exception as e:
+        raise RuntimeError(f"Could not load Google credentials: {e}")
 
-    creds = Credentials.from_service_account_file(str(CREDENTIALS_PATH), scopes=scope)
-    client = gspread.authorize(creds)
+
+@app.route("/add", methods=["POST"])
+def add_expense():
+    client = _get_gspread_client()
 
     spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/12gW_5E-dc8_t06jHLhiBmeGqRwH0OgOXlpM2XwUrPiI/edit?gid=314051676#gid=314051676")
     worksheet = spreadsheet.worksheet("Form Responses 1")
@@ -117,4 +139,5 @@ def index():
     )
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
